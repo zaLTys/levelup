@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(configure =>
         configure.JsonSerializerOptions.PropertyNamingPolicy = null);
+
+JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 // create an HttpClient used for accessing the API
 builder.Services.AddHttpClient("APIClient", client =>
@@ -47,8 +51,18 @@ builder.Services.AddAuthentication(options =>
         //options.Scope.Add("openid"); //<<<requested by middleware by default
         //options.Scope.Add("profile"); //<<<requested by middleware by default
         //options.CallbackPath = new PathString("signin-oidc"); //redirect uri in IDP, also default
-
+        
+        //options.SignedOutCallbackPath : default = host/port/signout-callback-oidc - register in IDP
+        options.GetClaimsFromUserInfoEndpoint = true;
         options.SaveTokens = true; //save tokens in cookie
+        
+        //remove filter for default claim, should load in our claims, not very intuitive ¯\_(ツ)_/¯
+        options.ClaimActions.Remove("aud");
+        //remove excessive Claims themselves
+        options.ClaimActions.DeleteClaim("sid");
+        options.ClaimActions.DeleteClaim("idp");
+        
+
     });
 
 var app = builder.Build();

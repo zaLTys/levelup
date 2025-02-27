@@ -38,6 +38,11 @@ public static class Config
                     "https://localhost:7188/signin-oidc" // Redirect URI for OpenID Connect authentication in webUI project
                 },
 
+                PostLogoutRedirectUris =
+                {
+                    "https://localhost:7188/signout-callback-oidc" // Redirect URI after logout
+                },
+
                 // Defines the scopes that this client can request
                 AllowedScopes =
                 {
@@ -49,7 +54,8 @@ public static class Config
                 ClientSecrets =
                 {
                     new Secret("secret".Sha256()) // Hashed secret used for client authentication
-                }
+                },
+                RequireConsent = true // consent to share needed info
             }
         };
 }

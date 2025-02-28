@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,6 +51,7 @@ builder.Services.AddAuthentication(options =>
 
         //options.Scope.Add("openid"); //<<<requested by middleware by default
         //options.Scope.Add("profile"); //<<<requested by middleware by default
+        options.Scope.Add("roles");
         //options.CallbackPath = new PathString("signin-oidc"); //redirect uri in IDP, also default
         
         //options.SignedOutCallbackPath : default = host/port/signout-callback-oidc - register in IDP
@@ -62,7 +64,17 @@ builder.Services.AddAuthentication(options =>
         options.ClaimActions.DeleteClaim("sid");
         options.ClaimActions.DeleteClaim("idp");
         
+        //If only one key claim is present then it's fine
+        //options.ClaimActions.MapUniqueJsonKey("role", "role");
+        
+        //VVV If user has multiple roles, then it could come up multiple times so this one is better VVV
+        options.ClaimActions.MapJsonKey("role", "role");
 
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            NameClaimType = "name",
+            RoleClaimType = "role"
+        };
     });
 
 var app = builder.Build();

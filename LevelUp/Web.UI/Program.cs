@@ -35,7 +35,10 @@ builder.Services.AddAuthentication(options =>
     })
 
     // Adds cookie authentication for managing user sessions
-    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+    {
+        options.AccessDeniedPath = "/Authentication/AccessDenied";
+    })
 
     // Adds OpenID Connect authentication for authenticating users
     .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>

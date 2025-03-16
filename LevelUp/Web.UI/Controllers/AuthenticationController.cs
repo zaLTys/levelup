@@ -20,5 +20,10 @@ namespace Web.UI.Controllers
             //Clear the OIDC session own cookie
             await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
         }
+
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
     }
 }

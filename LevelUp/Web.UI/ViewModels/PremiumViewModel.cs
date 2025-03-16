@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 namespace Web.UI.ViewModels
 {
-    public class IndexViewModel
+    public class PremiumViewModel
     {
-        public string Content { get; set; } = "Index content";
+        public string Content { get; set; } = "PREMIUM CONTENT";
     }
 }

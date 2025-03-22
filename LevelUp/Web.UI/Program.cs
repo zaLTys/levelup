@@ -14,6 +14,7 @@ builder.Services.AddControllersWithViews()
 
 JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
+builder.Services.AddOpenIdConnectAccessTokenManagement();
 // create an HttpClient used for accessing the API
 builder.Services.AddHttpClient("APIClient", client =>
 {
@@ -55,6 +56,7 @@ builder.Services.AddAuthentication(options =>
         //options.Scope.Add("openid"); //<<<requested by middleware by default
         //options.Scope.Add("profile"); //<<<requested by middleware by default
         options.Scope.Add("roles");
+        options.Scope.Add("demowebapi.fullaccess");
         //options.CallbackPath = new PathString("signin-oidc"); //redirect uri in IDP, also default
         
         //options.SignedOutCallbackPath : default = host/port/signout-callback-oidc - register in IDP

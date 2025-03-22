@@ -1,10 +1,16 @@
 ﻿using Web.UI.Controllers;
 using System.Collections.Generic;
+using Demo.Web.API;
 
 namespace Web.UI.ViewModels
 {
     public class IndexViewModel
     {
-        public string Content { get; set; } = "Index content";
+        public List<WeatherForecast> Content { get; set; }
+
+        public IndexViewModel(List<WeatherForecast> content)
+        {
+            Content = content;
+        }
     }
 }

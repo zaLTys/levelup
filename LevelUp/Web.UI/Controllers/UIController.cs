@@ -1,4 +1,6 @@
 ﻿using System.Text;
+using System.Text.Json;
+using Demo.Web.API;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,12 +22,27 @@ namespace Web.UI.Controllers
                 throw new ArgumentNullException(nameof(httpClientFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-
+        
         public async Task<IActionResult> Index()
         {
             await LogIdentityInformation();
-            
-            return View(new IndexViewModel());
+
+            var httpClient = _httpClientFactory.CreateClient("APIClient");
+
+            var request = new HttpRequestMessage(
+                HttpMethod.Get,
+                "/WeatherForecast");
+
+            var response = await httpClient.SendAsync(
+                request, HttpCompletionOption.ResponseHeadersRead);
+
+            response.EnsureSuccessStatusCode();
+
+            await using (var responseStream = await response.Content.ReadAsStreamAsync())
+            {
+                var demoApiResponse = await JsonSerializer.DeserializeAsync<List<WeatherForecast>>(responseStream);
+                return View(new IndexViewModel(demoApiResponse ?? []));
+            }
         }
         
         [Authorize(Roles = "PremiumUser")]

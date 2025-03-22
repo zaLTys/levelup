@@ -14,6 +14,7 @@ builder.Services.AddControllersWithViews()
 
 JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
+//add management middleware
 builder.Services.AddOpenIdConnectAccessTokenManagement();
 // create an HttpClient used for accessing the API
 builder.Services.AddHttpClient("APIClient", client =>
@@ -21,7 +22,9 @@ builder.Services.AddHttpClient("APIClient", client =>
     client.BaseAddress = new Uri(builder.Configuration["WebApiRoot"]);
     client.DefaultRequestHeaders.Clear();
     client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
-});
+//add token handler to client
+}).AddUserAccessTokenHandler()
+  .AddHttpMessageHandler(() => new LoggingHandler());
 
 //add to configura authentication middleware
 builder.Services.AddAuthentication(options =>
@@ -103,3 +106,12 @@ app.MapControllerRoute(
     pattern: "{controller=UI}/{action=Index}/{id?}");
 
 app.Run();
+
+public class LoggingHandler : DelegatingHandler
+{
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        Console.WriteLine("Authorization Header: " + request.Headers.Authorization);
+        return await base.SendAsync(request, cancellationToken);
+    }
+}

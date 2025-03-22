@@ -38,11 +38,11 @@ namespace Web.UI.Controllers
 
             response.EnsureSuccessStatusCode();
 
-            await using (var responseStream = await response.Content.ReadAsStreamAsync())
-            {
-                var demoApiResponse = await JsonSerializer.DeserializeAsync<List<WeatherForecast>>(responseStream);
-                return View(new IndexViewModel(demoApiResponse ?? []));
-            }
+            await using var responseStream = await response.Content.ReadAsStreamAsync();
+            using var reader = new StreamReader(responseStream);
+            var jsonString = await reader.ReadToEndAsync();
+
+            return View(new IndexViewModel(jsonString));
         }
         
         [Authorize(Roles = "PremiumUser")]
@@ -59,6 +59,10 @@ namespace Web.UI.Controllers
             var identityToken = await HttpContext
                 .GetTokenAsync(OpenIdConnectParameterNames.IdToken);
 
+            // get the saved access token
+            var accessToken = await HttpContext
+                .GetTokenAsync(OpenIdConnectParameterNames.AccessToken);
+
             var userClaimsStringBuilder = new StringBuilder();
             foreach (var claim in User.Claims)
             {
@@ -69,6 +73,8 @@ namespace Web.UI.Controllers
             // log token & claims
             _logger.LogInformation($"Identity token & user claims: " +
                                    $"\n{identityToken} \n{userClaimsStringBuilder}");
+            _logger.LogInformation($"Access token: " +
+                                   $"\n{accessToken}");
         }
     }
 }

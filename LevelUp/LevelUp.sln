@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Duende.IDP", "Duende.IDP\Du
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web.UI", "Web.UI\Web.UI.csproj", "{B8417E93-59D0-46D1-8B99-9B81BF979D83}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo.Web.API", "Demo.Web.API\Demo.Web.API.csproj", "{EB0E8A7D-17EC-45B0-8DBA-4DC742FFA83D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{B8417E93-59D0-46D1-8B99-9B81BF979D83}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8417E93-59D0-46D1-8B99-9B81BF979D83}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8417E93-59D0-46D1-8B99-9B81BF979D83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB0E8A7D-17EC-45B0-8DBA-4DC742FFA83D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB0E8A7D-17EC-45B0-8DBA-4DC742FFA83D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB0E8A7D-17EC-45B0-8DBA-4DC742FFA83D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB0E8A7D-17EC-45B0-8DBA-4DC742FFA83D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

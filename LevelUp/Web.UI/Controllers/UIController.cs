@@ -52,6 +52,33 @@ namespace Web.UI.Controllers
             
             return View(new PremiumViewModel());
         }
+        
+        [Authorize(Roles = "PremiumUser")]
+        [HttpPost]
+        public async Task<IActionResult> Create(WeatherForecast model)
+        {
+            await LogIdentityInformation();
+
+            var httpClient = _httpClientFactory.CreateClient("DemoWebApiClient");
+
+            var request = new HttpRequestMessage(
+                HttpMethod.Post,
+                "/WeatherForecast")
+            {
+                Content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json")
+            };
+
+            var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+
+            response.EnsureSuccessStatusCode();
+
+            await using var responseStream = await response.Content.ReadAsStreamAsync();
+            using var reader = new StreamReader(responseStream);
+            var jsonString = await reader.ReadToEndAsync();
+
+            return View("Index", new IndexViewModel(jsonString));
+        }
+
 
         public async Task LogIdentityInformation()
         {

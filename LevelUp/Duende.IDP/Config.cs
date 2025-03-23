@@ -18,7 +18,7 @@ public static class Config
     public static IEnumerable<ApiResource> ApiResources =>
         new ApiResource[]
         {
-            new ApiResource("demowebapi", "Demo Web API")
+            new ApiResource("demowebapi", "Demo Web API", new[] { "role" })
             {
                 Scopes = { "demowebapi.fullaccess" }
             }

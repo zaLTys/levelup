@@ -1,10 +1,26 @@
 ﻿@model Web.UI.ViewModels.PremiumViewModel
 
-<div class="bottomMarginDefault">
-</div>
+<div class="bottomMarginDefault"></div>
 
 <div class="container">
     <div class="row">
-        @Model.Content
+        <form method="post" asp-action="Create" asp-controller="UI">
+            <div class="mb-3">
+                <label for="Date" class="form-label">Date</label>
+                <input type="date" id="Date" name="Date" class="form-control" required />
+            </div>
+
+            <div class="mb-3">
+                <label for="TemperatureC" class="form-label">Temperature (°C)</label>
+                <input type="number" id="TemperatureC" name="TemperatureC" class="form-control" required />
+            </div>
+
+            <div class="mb-3">
+                <label for="Summary" class="form-label">Summary</label>
+                <input type="text" id="Summary" name="Summary" class="form-control" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
     </div>
-</div> 
+</div>

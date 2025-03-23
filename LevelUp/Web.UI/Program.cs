@@ -17,9 +17,9 @@ JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear();
 //add management middleware
 builder.Services.AddOpenIdConnectAccessTokenManagement();
 // create an HttpClient used for accessing the API
-builder.Services.AddHttpClient("APIClient", client =>
+builder.Services.AddHttpClient("DemoWebApiClient", client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["WebApiRoot"]);
+    client.BaseAddress = new Uri(builder.Configuration["DemoWebApiRoot"]);
     client.DefaultRequestHeaders.Clear();
     client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
 //add token handler to client

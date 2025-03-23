@@ -27,7 +27,7 @@ namespace Web.UI.Controllers
         {
             await LogIdentityInformation();
 
-            var httpClient = _httpClientFactory.CreateClient("APIClient");
+            var httpClient = _httpClientFactory.CreateClient("DemoWebApiClient");
 
             var request = new HttpRequestMessage(
                 HttpMethod.Get,

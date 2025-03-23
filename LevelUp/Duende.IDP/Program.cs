@@ -15,10 +15,24 @@ try
         .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}")
         .Enrich.FromLogContext()
         .ReadFrom.Configuration(ctx.Configuration));
+    
 
-    var app = builder
-        .ConfigureServices()
-        .ConfigurePipeline();
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowAllOrigins",
+            policy =>
+            {
+                policy.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            });
+    });
+
+    var app = builder.ConfigureServices();
+    
+    app.UseCors("AllowAllOrigins"); // Ensure this is before Authentication/Authorization middleware
+    
+    app.ConfigurePipeline();
     
     app.Run();
 }

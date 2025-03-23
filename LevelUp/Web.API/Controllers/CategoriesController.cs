@@ -1,12 +1,15 @@
 using DataAccessLayer;
 using DataAccessLayer.Models;
 using DataAccessLayer.UoW;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Writers;
 
 namespace Web.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class CategoriesController : ControllerBase
@@ -73,6 +76,7 @@ public class CategoriesController : ControllerBase
                     .ToList();
     }
     
+    [Authorize()]
     [HttpPost]
     public IActionResult CreateCategory([FromBody] Category category)
     {

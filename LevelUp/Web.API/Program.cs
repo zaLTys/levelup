@@ -4,6 +4,8 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.VersionTableInfo;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace Web.API
 {
@@ -23,7 +25,32 @@ namespace Web.API
                 //.EnableSensitiveDataLogging() // Optional, logs parameter values
                 //.LogTo(Console.WriteLine, LogLevel.Information);
             });
-
+            
+            builder.Services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = "Cookies";
+                    options.DefaultChallengeScheme = "oidc";
+                })
+                .AddCookie("Cookies")
+                .AddOpenIdConnect("oidc", options =>
+                {
+                    options.Authority = "https://localhost:5001";
+                    options.ClientId = "efcorewebapiclient";
+                    options.ClientSecret = "efcorewebapiclient-secret";
+                    options.ResponseType = "code";
+                    options.SaveTokens = true;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = "https://localhost:5001";
+                    options.Audience = "efcorewebapiclient";
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateAudience = true,
+                        ValidateIssuer = true
+                    };
+                });
+            
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
@@ -33,7 +60,46 @@ namespace Web.API
                 });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API", Version = "v1" });
+
+                c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.OAuth2,
+                    Flows = new OpenApiOAuthFlows
+                    {
+                        AuthorizationCode = new OpenApiOAuthFlow
+                        {
+                            AuthorizationUrl = new Uri("https://localhost:5001/connect/authorize"),
+                            TokenUrl = new Uri("https://localhost:5001/connect/token"),
+                            Scopes = new Dictionary<string, string>
+                            {
+                                { "openid", "OpenID scope" },
+                                { "profile", "User profile scope" },
+                                { "api.read", "Read access to API" },
+                                { "api.write", "Write access to API" }
+                            }
+                        }
+                    }
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "oauth2"
+                            }
+                        },
+                        new[] { "api.read", "api.write" }
+                    }
+                });
+            });
             
             //Fluent migrator
             builder.Services.AddFluentMigratorCore()
@@ -49,7 +115,16 @@ namespace Web.API
                     opt.Tags = new[] { "Postgres" };
                 });
 
-
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                });
+            });
+            
             var app = builder.Build();
 
             using (var scope = app.Services.CreateScope())
@@ -96,16 +171,24 @@ namespace Web.API
                     Console.WriteLine($"Invalid migration target: {migrateTo}. No action taken.");
                 }
             }
+            
+            app.UseCors("AllowAllOrigins");
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Your API v1");
+
+                c.OAuthClientId("efcorewebapiclient");
+                c.OAuthClientSecret("efcorewebapiclient-secret");
+                c.OAuthUsePkce(); // Enables PKCE flow
+                c.OAuth2RedirectUrl("https://localhost:7285/swagger/oauth2-redirect.html");
+            });
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();

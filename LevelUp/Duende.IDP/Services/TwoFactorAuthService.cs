@@ -36,7 +36,7 @@ namespace Duende.IDP.Services
 
         public async Task<ServiceResponse<TwoFactorAuthSettings>> GetSettings(CancellationToken cancellationToken)
         {
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userId = _httpContextAccessor.HttpContext.User.FindFirst("sub").Value;
 
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
@@ -52,7 +52,7 @@ namespace Duende.IDP.Services
 
         public async Task<ServiceResponse<TwoFactorAuthSettings>> Enable2FA(string code, CancellationToken cancellationToken)
         {
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userId = _httpContextAccessor.HttpContext.User.FindFirst("sub").Value;
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
                 return ServiceResponse<TwoFactorAuthSettings>.Error("User not found");
